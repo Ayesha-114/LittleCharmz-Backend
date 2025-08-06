@@ -1,4 +1,6 @@
 import type { Express } from "express";
+import { productSchema } from "./schema";
+
 import express from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
