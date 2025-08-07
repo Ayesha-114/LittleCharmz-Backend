@@ -1,22 +1,23 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors"; // ✅ Add this line
 import { registerRoutes } from "./routes";
 import path from "path";
-import cors from "cors"; // ✅ Step 1
 
 const app = express();
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: false, limit: "50mb" }));
-
-app.use(cors({ // ✅ Step 2
+// ✅ CORS Setup
+app.use(cors({
   origin: "https://littlecharmz.com",
   credentials: true,
 }));
 
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Your existing middleware...
+// Logging middleware (same as before)
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -35,18 +36,17 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
-      console.log(logLine); // Just log it
+      console.log(logLine);
     }
   });
 
   next();
 });
 
+// Start Server
 (async () => {
   const server = await registerRoutes(app);
 
@@ -69,4 +69,3 @@ app.use((req, res, next) => {
     }
   );
 })();
-
